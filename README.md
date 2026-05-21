@@ -1,29 +1,40 @@
-# Hospital-admission
+# Hospital-admission SQL Project
 
-📄 hospital_admissions.csv [link]()
+📄 hospital_admissions.csv
 📄 icd10_codes.csv
 
-### The data has 10 columns, with the following variables
-- Admission_id
-- patient_id
-- admission_date
-- discharge_date
-- primary_diagnosis_code
-- procedure_code
-- age
-- gender
-- provider_code
-- ccg_code
 
-### For this project, I will be using 2 tables containing the main data of hospital admissions, the second table is ICD10 codes table with only 3 columns. E.g of what the table is about; A01/Typhoid fever/Infectious diseases
+### Create 2 tables under a new schema, hc_analysis before filling it with data from an excel spreadsheets
+```
+CREATE SCHEMA hc_analysis;
+```
+#### Table 1: hospital_admission
+```
+CREATE TABLE hospital_admissions (
+Admission_id INT PRIMARY KEY
+,patient_id VARCHAR (20)
+,admission_date DATE
+,discharge_date DATE
+,primary_diagnosis_code VARCHAR (20)
+,procedure_code VARCHAR (20)
+,age INT
+,gender CHAR (1)
+,provider_code VARCHAR (20)
+,ccg_code VARCHAR (20)
+);
+```
+#### Table 2: icd10_codes
+```
+CREATE TABLE icd10_codes (
+code VARCHAR (20) PRIMARY KEY
+,description TEXT
+,chapter_name TEXT
+);
+```
 
-- code
-- description 
-- chapter_name
 
-Import the 2 tables and load the them to check if the data was imported successfully, using SQL syntax, SELECT * From schema.table_name.
 
-Understanding the nature of the data (data structure):
+### Understanding the nature of the data (data structure of hospital_admissions table):
 | Column name | Description | 
 |---|---|
 |Admission_id| Primary key, unique identifier (patient id is more relevant) |
