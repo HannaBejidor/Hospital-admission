@@ -1,4 +1,20 @@
-# Hospital-admission SQL Project
+# Hospital-admission Project in SQL
+## Project summary:
+This project was made to understand and tackle existing problems in the hospital, such as:
+- Operational Problem
+- Financial or resource problem
+- Public health problem
+- Performance and quality problem
+## Aim of this project is to answer core business problems
+1. Admission trend overview
+2. Length of Stay (LOS) Analysis: average stay, diagnoses with longest stay, does age/gender have affect on LOS?
+3. Diagnosis & Disease Burden: top diagnosis, icd10 chapter dominate admission?
+4. Demographic analysis: age and gender distribution, age group with most admission, diagnosis affect elderly patients
+5. Provider Performance: provider with highest admission, provider with longest LOS, are some provider overload? 
+6. Repeat admission / patient utilization: which patients are repeatedly admitted, diagnoses lean to readmissions, chronic conditions causing repeat visits?
+
+
+#### Dataset from this project was sourced from two tables;
 
 📄 hospital_admissions.csv
 📄 icd10_codes.csv
@@ -61,15 +77,6 @@ code VARCHAR (20) PRIMARY KEY
 
 ``` SELECT * FROM icd10_codes; ```
 
-#### Aim & Objectives:
-/*
-1. Admission trend
-2. Length of stay (LOS) Analysis: average stay, diagnoses with longest stay, does age/gender have affect on LOS?
-3. Diagnosis & Disease Burden: top diagnosis, icd10 chapter dominate admission?, disease growing fast, disease with longest LOS
-4. Demographic analysis: age group with most admission, diagnosis affect elderly patients
-5.  Repeat admission / patient utilization: which patients are repeatedly admitted, diagnoses lean to readmissions, chronic conditions causing repeat visits?
-
-*/
 
 1. Find out the number on admission monthly/yearly. Does the admission increases over time? Was there a seasonal spike? Which diagnosis with the most admission?
 ```
