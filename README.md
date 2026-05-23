@@ -90,7 +90,7 @@ SELECT patient_id
 	,ROUND(avg(datediff(discharge_date, admission_date)),1) AS ave_los
 FROM hospital_admissions
 GROUP BY patient_id
-ORDER BY ave_date_admission desc;
+ORDER BY ave_los desc;
 ```
 #### Insight:
 ```
@@ -154,11 +154,14 @@ FROM
 	(
 SELECT age,
    CASE
-		WHEN age BETWEEN 0 AND 15 THEN '0-15'
-		WHEN age BETWEEN 6 AND 30 THEN '16-30'
-		WHEN age BETWEEN 31 AND 45 THEN '31-45'
-		WHEN age BETWEEN 46 AND 65 THEN '46-65'
-		WHEN age BETWEEN 66 AND 80 THEN '66-80'
+		WHEN age BETWEEN 0 AND 10 THEN '0-10'
+		WHEN age BETWEEN 11 AND 20 THEN '11-20'
+		WHEN age BETWEEN 21 AND 30 THEN '21-30'
+		WHEN age BETWEEN 31 AND 40 THEN '31-40'
+		WHEN age BETWEEN 41 AND 50 THEN '41-50'
+        WHEN age BETWEEN 51 AND 60 THEN '51-60'
+        WHEN age BETWEEN 61 AND 70 THEN '61-70'
+        WHEN age BETWEEN 71 AND 80 THEN '71-80'
 ELSE '80+'
 END AS age_group
 FROM hospital_admissions
@@ -174,11 +177,14 @@ FROM
 	(
 SELECT patient_id,admission_date,age,
 CASE
-		WHEN age BETWEEN 0 AND 15 THEN '0-15'
-		WHEN age BETWEEN 6 AND 30 THEN '16-30'
-		WHEN age BETWEEN 31 AND 45 THEN '31-45'
-		WHEN age BETWEEN 46 AND 65 THEN '46-65'
-		WHEN age BETWEEN 66 AND 80 THEN '66-80'
+		WHEN age BETWEEN 0 AND 10 THEN '0-10'
+		WHEN age BETWEEN 11 AND 20 THEN '11-20'
+		WHEN age BETWEEN 21 AND 30 THEN '21-30'
+		WHEN age BETWEEN 31 AND 40 THEN '31-40'
+		WHEN age BETWEEN 41 AND 50 THEN '41-50'
+        WHEN age BETWEEN 51 AND 60 THEN '51-60'
+        WHEN age BETWEEN 61 AND 70 THEN '61-70'
+        WHEN age BETWEEN 71 AND 80 THEN '71-80'
 ELSE '80+'
 END AS age_group
 	FROM hospital_admissions
