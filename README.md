@@ -80,6 +80,17 @@ code VARCHAR (20) PRIMARY KEY
 
 1. Find out the number on admission monthly/yearly. Does the admission increases over time? Was there a seasonal spike? Which diagnosis with the most admission?
 ```
+-- admission:patient count --
+
+SELECT	COUNT(admission_id) AS admission_count,
+		COUNT(DISTINCT patient_id) AS patient_count
+FROM hospital_admissions; # A total of 500 admissions in 100 patients, suggesting multiple readmission cases
+```
+#### Answer: Total of 500 admissions, with 100 unique patients
+<img width="235" height="53" alt="Screenshot 2026-05-24 235416" src="https://github.com/user-attachments/assets/0dc3d529-0b5f-4a9c-9019-dfd08d0cb520" />
+
+## 1. Admission Trend overview:
+```
 -- 1. Admission trend per month --
 SELECT 
 	date_format(admission_date, '%Y-%m') AS admission_month,
@@ -88,35 +99,34 @@ FROM hospital_admissions
 GROUP BY admission_month
 ORDER BY admission_month ASC;
 ```
-#### Insight:
+#### Answer:
+<img width="274" height="304" alt="Screenshot 2026-05-25 000813" src="https://github.com/user-attachments/assets/1cab9265-8569-4210-a837-0808c11763e6" />
 
-2.  Length of stay (LOS) Analysis: What is longest stay in the hospital? which diagnosis leads to a longest stay? Which provider has higher LOS?
+
+## 2. Length of stay (LOS) Analysis:
 ```
 -- average length of stay-- 
-SELECT patient_id
-	,ROUND(avg(datediff(discharge_date, admission_date)),1) AS ave_los
-FROM hospital_admissions
-GROUP BY patient_id
-ORDER BY ave_los desc;
-```
-#### Insight:
-```
--- top 5 diagnosis based on LOS --
 SELECT
-  h.patient_id,
-  h.primary_diagnosis_code as primary_code,
-  ic.description,
-  h.discharge_date,
-  h.admission_date,
-  (datediff(h.discharge_date, h.admission_date)) AS los
+	ROUND(avg(datediff(discharge_date, admission_date)),1) AS ave_los
+FROM hospital_admissions;
+```
+#### Answer: average LOS of = 5.68
+```
+-- top 5 diagnostic chapter based on average los --
+SELECT 	h.primary_diagnosis_code as primary_code,
+		ic.chapter_name,
+		ROUND(avg(datediff(h.discharge_date, h.admission_date)),2) AS ave_los
 FROM hospital_admissions as h
-  JOIN icd10_codes as ic ON h.primary_diagnosis_code = ic.code
-ORDER BY los DESC
+	JOIN icd10_codes as ic ON h.primary_diagnosis_code = ic.code
+GROUP BY primary_code
+ORDER BY ave_los DESC
 LIMIT 5;
 ```
-#### Insight:
+#### Answer:
+<img width="294" height="133" alt="Screenshot 2026-05-25 002229" src="https://github.com/user-attachments/assets/74bb919e-1db1-44fb-b813-72702c4ced35" />
+
 ```
--- diagnoses with longest stay --
+-- top diagnoses based on overall average lenght of stay --
 SELECT
   h.primary_diagnosis_code as primary_code,
   ic.description,
@@ -126,11 +136,12 @@ FROM hospital_admissions as h
 GROUP BY primary_code
 ORDER BY ave_los DESC; 
 ```
-#### Insight:
+#### Answer:
+<img width="400" height="240" alt="Screenshot 2026-05-25 002655" src="https://github.com/user-attachments/assets/0a85c507-504a-41c7-b500-46d9a6e1c5fd" />
 
-3. Diagnosis & Disease Burden: What are the top diagnosis? Which ICD10 code chapter dominates the admission?
+## 3. Diagnosis & Disease Burden:
 ```
--- top 5 diagnosis --
+-- top diagnosis --
 SELECT
   h.primary_diagnosis_code AS code,
   ic.description,
@@ -138,12 +149,13 @@ SELECT
 FROM hospital_admissions as h
   JOIN icd10_codes as ic ON h.primary_diagnosis_code = ic.code
 GROUP BY code
-ORDER BY top_diagnosis DESC
-LIMIT 5; 
+ORDER BY top_diagnosis DESC; 
 ```
-#### Insight:
+#### Answer: Most admission:(I10) Essential hypertension of n= 61 ; Least: (N18) Chronic Kidney disease of 38 admission
+<img width="599" height="236" alt="Screenshot 2026-05-25 003355" src="https://github.com/user-attachments/assets/c7e060db-0a32-405d-a8f1-ff04864b3e4e" />
 
-4. Demographic analysis: Observe Age and gender distribution. Which age group with most admission? Which diagnosis is more prevalent in elderly people (aged ≥65)
+
+## 4. Demographic analysis:
 
 ```
 -- Age aggregation --
@@ -153,7 +165,7 @@ SELECT
   AVG(age) AS average
 FROM hospital_admissions;
 ```
-#### Insight:
+#### Answer: Minimum age = 0 ; Maximun age = 90 years old; Mean age = 44.9 years old
 ```
 -- age group distribution --
 SELECT age_group, count(*) AS admission_count
@@ -176,7 +188,9 @@ FROM hospital_admissions
     GROUP BY age_group
     ORDER BY age_group ASC;
 ```
-#### Insight:   
+#### Answer: 
+<img width="208" height="219" alt="Screenshot 2026-05-25 003636" src="https://github.com/user-attachments/assets/8c8300c1-a13c-4f7c-9d0f-d7748c442198" />
+
 ```            
 -- age group with most admission --
 SELECT age_group, count(*) AS admission_count
@@ -199,28 +213,26 @@ END AS age_group
 GROUP BY age_group
 ORDER BY admission_count DESC;
 ```
-#### Insight:
+#### Answer: Age group 11-20 years has the highest admission of n= 62; While Age group with lowest admission were 71-80 of n= 45
 
 ```
 -- gender distribution --
-SELECT  gender,
-        COUNT(gender) AS count
+SELECT	gender,
+		COUNT(gender),
+		ROUND((COUNT(gender)/ (SELECT COUNT(gender) FROM hospital_admissions)*100),0) AS percentage
 FROM hospital_admissions
 GROUP BY gender;
 ```
-#### Insight:
+#### Answer: 49% Male patients (n=245) & 51% Female patients (n=255)
+
+## 5. Provider Performance:
 ```
--- diagnosis affect on elderly/ top diagnosis patients aged ≥ 65--
-SELECT
-  h.age,
-  h.primary_diagnosis_code AS code,
-  ic.description,
-  ic.chapter_name,
-  COUNT(h.admission_id) AS top_diagnosis
-FROM hospital_admissions as h
-  JOIN icd10_codes as ic ON h.primary_diagnosis_code = ic.code
-WHERE age >=65
-GROUP BY code, age
-ORDER BY top_diagnosis DESC;
+-- Provider with highest admission--
+SELECT 	DISTINCT provider_code,
+		COUNT(admission_id) AS admission_count
+FROM hospital_admissions
+GROUP BY provider_code
+ORDER BY admission_count DESC;
 ```
-#### Insight:
+#### Answer:
+<img width="262" height="95" alt="Screenshot 2026-05-24 231054" src="https://github.com/user-attachments/assets/82d3aad6-90bc-4f40-8066-aa009bad97c3" />
