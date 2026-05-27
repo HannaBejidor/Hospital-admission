@@ -77,21 +77,20 @@ code VARCHAR (20) PRIMARY KEY
 
 ``` SELECT * FROM icd10_codes; ```
 
+## 1. Admission Trend overview:
+### -- Admission:Patient count ratio --
 
-1. Find out the number on admission monthly/yearly. Does the admission increases over time? Was there a seasonal spike? Which diagnosis with the most admission?
 ```
--- admission:patient count --
-
 SELECT	COUNT(admission_id) AS admission_count,
 		COUNT(DISTINCT patient_id) AS patient_count
-FROM hospital_admissions; # A total of 500 admissions in 100 patients, suggesting multiple readmission cases
+FROM hospital_admissions;
 ```
+
 #### Answer: Total of 500 admissions, with 100 unique patients
 <img width="235" height="53" alt="Screenshot 2026-05-24 235416" src="https://github.com/user-attachments/assets/0dc3d529-0b5f-4a9c-9019-dfd08d0cb520" />
 
-## 1. Admission Trend overview:
+### -- 1. Admission trend per month --
 ```
--- 1. Admission trend per month --
 SELECT 
 	date_format(admission_date, '%Y-%m') AS admission_month,
 	COUNT(admission_id) AS admission_over_time
@@ -104,15 +103,16 @@ ORDER BY admission_month ASC;
 
 
 ## 2. Length of stay (LOS) Analysis:
+### -- average length of stay--
 ```
--- average length of stay-- 
 SELECT
 	ROUND(avg(datediff(discharge_date, admission_date)),1) AS ave_los
 FROM hospital_admissions;
 ```
 #### Answer: average LOS of = 5.68
+
+### -- top 5 diagnostic chapter based on average los --
 ```
--- top 5 diagnostic chapter based on average los --
 SELECT 	h.primary_diagnosis_code as primary_code,
 		ic.chapter_name,
 		ROUND(avg(datediff(h.discharge_date, h.admission_date)),2) AS ave_los
@@ -125,8 +125,8 @@ LIMIT 5;
 #### Answer:
 <img width="294" height="133" alt="Screenshot 2026-05-25 002229" src="https://github.com/user-attachments/assets/74bb919e-1db1-44fb-b813-72702c4ced35" />
 
+### -- top diagnoses based on overall average lenght of stay --
 ```
--- top diagnoses based on overall average lenght of stay --
 SELECT
   h.primary_diagnosis_code as primary_code,
   ic.description,
@@ -140,8 +140,8 @@ ORDER BY ave_los DESC;
 <img width="400" height="240" alt="Screenshot 2026-05-25 002655" src="https://github.com/user-attachments/assets/0a85c507-504a-41c7-b500-46d9a6e1c5fd" />
 
 ## 3. Diagnosis & Disease Burden:
+### -- top diagnosis --
 ```
--- top diagnosis --
 SELECT
   h.primary_diagnosis_code AS code,
   ic.description,
@@ -154,11 +154,9 @@ ORDER BY top_diagnosis DESC;
 #### Answer: Most admission:(I10) Essential hypertension of n= 61 ; Least: (N18) Chronic Kidney disease of 38 admission
 <img width="599" height="236" alt="Screenshot 2026-05-25 003355" src="https://github.com/user-attachments/assets/c7e060db-0a32-405d-a8f1-ff04864b3e4e" />
 
-
 ## 4. Demographic analysis:
-
+### -- Age aggregation --
 ```
--- Age aggregation --
 SELECT 
 	MIN(age) AS minimun_age,
 	MAX(AGE) AS maximum_age,
@@ -166,8 +164,9 @@ SELECT
 FROM hospital_admissions;
 ```
 #### Answer: Minimum age = 0 ; Maximun age = 90 years old; Mean age = 44.9 years old
+
+### -- age group distribution --
 ```
--- age group distribution --
 SELECT age_group, count(*) AS admission_count
 FROM
 	(
@@ -191,8 +190,8 @@ FROM hospital_admissions
 #### Answer: 
 <img width="208" height="219" alt="Screenshot 2026-05-25 003636" src="https://github.com/user-attachments/assets/8c8300c1-a13c-4f7c-9d0f-d7748c442198" />
 
+### -- age group with most admission --
 ```            
--- age group with most admission --
 SELECT age_group, count(*) AS admission_count
 FROM
 	(
@@ -215,8 +214,8 @@ ORDER BY admission_count DESC;
 ```
 #### Answer: Age group 11-20 years has the highest admission of n= 62; While Age group with lowest admission were 71-80 of n= 45
 
+### -- gender distribution --
 ```
--- gender distribution --
 SELECT	gender,
 		COUNT(gender),
 		ROUND((COUNT(gender)/ (SELECT COUNT(gender) FROM hospital_admissions)*100),0) AS percentage
@@ -226,8 +225,9 @@ GROUP BY gender;
 #### Answer: 49% Male patients (n=245) & 51% Female patients (n=255)
 
 ## 5. Provider Performance:
+### -- Provider with highest admission--
+
 ```
--- Provider with highest admission--
 SELECT 	DISTINCT provider_code,
 		COUNT(admission_id) AS admission_count
 FROM hospital_admissions
@@ -236,3 +236,13 @@ ORDER BY admission_count DESC;
 ```
 #### Answer:
 <img width="262" height="95" alt="Screenshot 2026-05-24 231054" src="https://github.com/user-attachments/assets/82d3aad6-90bc-4f40-8066-aa009bad97c3" />
+
+### -- LOS of each provider --
+```
+SELECT 	provider_code,
+		ROUND(AVG(datediff(discharge_date,admission_date)),2) AS LOS
+FROM hospital_admissions
+GROUP BY provider_code;
+```
+#### Answer:
+<img width="159" height="93" alt="Screenshot 2026-05-27 180700" src="https://github.com/user-attachments/assets/b465048c-3675-4285-966d-7fdeb1f9a02d" />
